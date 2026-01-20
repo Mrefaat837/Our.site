@@ -250,10 +250,10 @@ async function logUser(name){
 }
 
 (async function accessGuard(){
-  //if(localStorage.getItem("access_granted")){
-    //await logUser(localStorage.getItem("user_name"));
-    //return;
-  //}
+  if(localStorage.getItem("access_granted")){
+    await logUser(localStorage.getItem("user_name"));
+    return;
+  }
 
   const answer = prompt(QUESTION);
   if(answer !== CORRECT_ANSWER){
@@ -396,3 +396,4 @@ function toggleLang() {
 
 </body>
 </html>
+
