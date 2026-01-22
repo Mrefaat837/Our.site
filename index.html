@@ -285,7 +285,48 @@ async function logUser(name){
 
   
 
-(async function accessGuard(){if(localStorage.getItem("access_granted")){
+(async function accessGuard(){if(
+  (async function accessGuard(){
+
+  const deviceId = localStorage.getItem("device_id");
+
+  // لو كان مسجل قبل كده
+  if(localStorage.getItem("access_granted") && deviceId){
+
+    const doc = await db.collection("users").doc(deviceId).get();
+
+    // لو الأدمن مسحه
+    if(!doc.exists){
+      localStorage.clear();
+      location.reload();
+      return;
+    }
+
+    // لسه موجود → حدّث الزيارة
+    await logUser(localStorage.getItem("user_name"));
+    return;
+  }
+
+  // ===== تسجيل جديد =====
+  const answer = prompt(QUESTION);
+
+  if(answer !== CORRECT_ANSWER){
+    await logFailed(answer);
+    document.body.innerHTML = `
+      <div style="text-align:center;padding:50px">
+        🚫 غير مسموح بالدخول
+      </div>`;
+    return;
+  }
+
+  const name = prompt("اكتب اسمك:") || "Unknown";
+  localStorage.setItem("access_granted","true");
+  localStorage.setItem("user_name",name);
+  await logUser(name);
+
+})()
+
+){
     await logUser(localStorage.getItem("user_name"));
     return;
 }
