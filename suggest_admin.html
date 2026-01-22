@@ -2,164 +2,145 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Dashboard | Mohamed Refaat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
 <style>
-:root{--primary:#e63946;--secondary:#b71c1c;--light:#fceae9;--dark:#2b0a0a;}
+:root { --primary:#e63946; --secondary:#b71c1c; --light:#fceae9; --dark:#2b0a0a; }
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
 body{background:var(--light);color:var(--dark);}
-header{min-height:120px;background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20px;}
-header h1{font-size:2.6rem;margin-bottom:10px;}
-#sidebar{position: fixed; left:-280px; top:0; width:280px; height:100%; background: var(--primary); color:#fff; padding:90px 25px; transition:0.5s; z-index:1000; overflow-y:auto;}
-#sidebar h3{ font-size:24px; margin-bottom:20px;}
-#sidebar ul{ list-style:none; font-size:18px; line-height:2.5; }
-#sidebar ul li a{ color:white; text-decoration:none; display:flex; align-items:center; gap:8px;}
-#toggleSidebarBtn{position: fixed; top:80px; left:20px; z-index:1002; padding:14px 18px; border-radius:12px; border:none; background: var(--secondary); color:white; font-size:26px; cursor:pointer;}
-.container{max-width:1200px;margin:140px auto 50px;padding:0 20px; display:grid; grid-template-columns:2fr 3fr; gap:30px;}
-.window{background:#fff;padding:20px;border-radius:12px;box-shadow:0 5px 15px rgba(0,0,0,0.1);overflow:auto;max-height:600px;}
-.window h3{text-align:center;margin-bottom:15px;}
-ul{list-style:none;padding-left:0;}
-li{margin-bottom:15px;padding:12px;border-bottom:1px solid #eee;}
-li strong{font-size:1.1rem;}
-li .time{display:block;margin-top:6px;font-size:0.85rem;color:#777;}
-.top-right{display:flex;flex-direction:column;gap:15px;}
+header{padding:25px;text-align:center;background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff;}
+
+.container{max-width:1200px;margin:40px auto;padding:20px;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:25px;}
+
+.box{
+  background:#fff;
+  padding:20px;
+  border-radius:14px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+.box h2{margin-bottom:15px;font-size:1.4rem;}
+ul{list-style:none;}
+li{margin-bottom:15px;padding:15px;border-radius:10px;background:#fdfdfd;border-left:6px solid #ccc;}
+.small{font-size:0.85rem;color:#666;}
+.foreign{border-left-color:#e63946;}
+.local{border-left-color:#2a9d8f;}
 </style>
 </head>
+
 <body>
 
-<!-- 🔐 Admin Password -->
+<!-- 🔐 Password -->
 <script>
-const ADMIN_PASSWORD="12345";
-const pass=prompt("Enter admin password:");
-if(pass!==ADMIN_PASSWORD){
-  document.body.innerHTML=`<div style="height:100vh;display:flex;justify-content:center;align-items:center;font-size:2rem;font-weight:700;color:#b71c1c;">🚫 Access Denied</div>`;
-  throw new Error("Access denied");
+const ADMIN_PASSWORD = "12345";
+const p = prompt("Admin password:");
+if(p !== ADMIN_PASSWORD){
+  document.body.innerHTML="<h1 style='text-align:center;margin-top:20%'>🚫 Access Denied</h1>";
+  throw new Error("Denied");
 }
 </script>
 
-<div id="sidebar">
-<h3>📚 Dashboard</h3>
-<ul>
-<li><a href="index.html">🏠 Home</a></li>
-    <li><a href="year1.html">🩺 Year 1</a></li>
-    <li><a href="year2.html">📖 Year 2</a></li>
-    <li><a href="year3.html">🏥 Year 3</a></li>
-    <li><a href="deen.html">🕌 Islamic Routine</a></li>
-    <li><a href="calc.html">🧮 Medical Calculators</a></li>
-    <li><a href="tasks.html">💪 Tasks</a></li>
-    <li><a href="brainwork.html">🧠 Brain Work</a></li>
-    <li><a href="suggest.html">💡 Suggestions</a></li>
-    <li><a href="suggest_admin.html">🔒 Admin</a></li>
-</ul>
-</div>
-<button id="toggleSidebarBtn">☰</button>
-
 <header>
-<h1>Admin Dashboard</h1>
-<p>All Data from Firebase</p>
+  <h1>Admin Dashboard</h1>
+  <p>Users – Suggestions – Activity</p>
 </header>
 
 <div class="container">
+  <div class="grid">
 
-<!-- Left Column: Suggestions + Failed -->
-<div class="window" id="suggestionsWindow">
-<h3>💡 Suggestions</h3>
-<ul id="suggestionsList"></ul>
-<h3>🚫 Failed Login Attempts</h3>
-<ul id="failedList"></ul>
-</div>
+    <!-- 🧑‍🤝‍🧑 Users -->
+    <div class="box">
+      <h2>🧑‍🤝‍🧑 Registered Users</h2>
+      <ul id="usersList"></ul>
+    </div>
 
-<!-- Right Column: Top Active + Registered Users -->
-<div class="top-right">
-<div class="window" id="topActiveWindow">
-<h3>🔥 Top Active Users</h3>
-<ul id="topActiveList"></ul>
-</div>
+    <!-- 💡 Suggestions -->
+    <div class="box">
+      <h2>💡 Suggestions</h2>
+      <ul id="suggestionsList"></ul>
+    </div>
 
-<div class="window" id="registeredWindow">
-<h3>✅ Registered Users</h3>
-<ul id="registeredList"></ul>
-</div>
-</div>
-
+  </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
 <script>
-const firebaseConfig={
-apiKey:"AIzaSyCaMUN2J922Uer9xGfhrBbrnlBNp2YljP0",
-authDomain:"mrefaat-2548a.firebaseapp.com",
-projectId:"mrefaat-2548a",
-storageBucket:"mrefaat-2548a.firebasestorage.app",
-messagingSenderId:"731800029782",
-appId:"1:731800029782:web:ec5c36eb8858e990eb49f7",
-measurementId:"G-6DQ87V5H92"
+const firebaseConfig = {
+  apiKey: "AIzaSyCaMUN2J922Uer9xGfhrBbrnlBNp2YljP0",
+  authDomain: "mrefaat-2548a.firebaseapp.com",
+  projectId: "mrefaat-2548a",
+  storageBucket: "mrefaat-2548a.firebasestorage.app",
+  messagingSenderId: "731800029782",
+  appId: "1:731800029782:web:ec5c36eb8858e990eb49f7"
 };
+
 firebase.initializeApp(firebaseConfig);
-const db=firebase.firestore();
+const db = firebase.firestore();
 
-/* Toggle Sidebar */
-const sidebar=document.getElementById('sidebar');
-document.getElementById('toggleSidebarBtn').onclick=()=>{sidebar.style.left=sidebar.style.left==='0px'?'-280px':'0px';};
-
-/* Suggestions */
-const suggestionsList=document.getElementById('suggestionsList');
-db.collection('suggestions').orderBy('timestamp','desc').onSnapshot(snapshot=>{
-  suggestionsList.innerHTML='';
-  snapshot.forEach(doc=>{
-    const d=doc.data();
-    const time=d.timestamp?d.timestamp.toDate().toLocaleString():'';
-    const li=document.createElement('li');
-    li.innerHTML=`<strong>${d.name}</strong> (${d.deviceId})<br>${d.suggestion}<span class="time">${time}</span>`;
-    suggestionsList.appendChild(li);
+/* USERS */
+db.collection("users")
+.orderBy("lastVisit","desc")
+.onSnapshot(snap=>{
+  const ul = document.getElementById("usersList");
+  ul.innerHTML="";
+  snap.forEach(doc=>{
+    const d = doc.data();
+    const last = d.lastVisit ? d.lastVisit.toDate().toLocaleString() : "";
+    const foreign = d.country !== "Egypt";
+    const li = document.createElement("li");
+    li.className = foreign ? "foreign" : "local";
+    li.innerHTML = `
+      <strong>${d.name}</strong><br>
+      <span class="small">ID: ${d.deviceId}</span><br>
+      🌍 ${d.country} - ${d.city}<br>
+      🔁 Visits: ${d.visits}<br>
+      ⏰ Last: ${last}
+      ${foreign ? "<div class='small'>🚨 Outside Egypt</div>" : ""}
+      <button onclick="deleteUser('dev_xxxxxx')">
+  🗑 حذف
+</button>
+    `;
+    ul.appendChild(li);
   });
 });
 
-/* Failed Attempts */
-const failedList=document.getElementById('failedList');
-db.collection('failed_attempts').orderBy('time','desc').onSnapshot(snapshot=>{
-  failedList.innerHTML='';
-  snapshot.forEach(doc=>{
-    const d=doc.data();
-    const time=d.time?d.time.toDate().toLocaleString():'';
-    const li=document.createElement('li');
-    li.innerHTML=`<strong>${d.deviceId}</strong> wrote: ${d.answer}<span class="time">${time}</span>`;
-    failedList.appendChild(li);
+/* SUGGESTIONS */
+db.collection("suggestions")
+.orderBy("timestamp","desc")
+.onSnapshot(snap=>{
+  const ul = document.getElementById("suggestionsList");
+  ul.innerHTML="";
+  snap.forEach(doc=>{
+    const d = doc.data();
+    const time = d.timestamp ? d.timestamp.toDate().toLocaleString() : "";
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <strong>${d.name}</strong>
+      <p>${d.suggestion}</p>
+      <span class="small">${time}</span>
+    `;
+    ul.appendChild(li);
   });
 });
+async function deleteUser(deviceIdToDelete){
+  if(!confirm("متأكد إنك عايز تحذف الشخص ده؟ هيضطر يسجل من أول وجديد")) return;
 
-/* Registered Users */
-const registeredList=document.getElementById('registeredList');
-db.collection('users').orderBy('firstVisit','asc').onSnapshot(snapshot=>{
-  registeredList.innerHTML='';
-  snapshot.forEach(doc=>{
-    const d=doc.data();
-    const visits=d.visitsCount||0;
-    const lastVisit=d.lastVisit?d.lastVisit.toDate().toLocaleString():'';
-    const durationSec=d.totalDuration||0;
-    const li=document.createElement('li');
-    li.innerHTML=`<strong>${d.name}</strong> | ID: ${d.deviceId}<br>Visits: ${visits} | Last: ${lastVisit} | Duration: ${durationSec} sec`;
-    registeredList.appendChild(li);
-  });
-});
+  try {
+    await db.collection("users").doc(deviceIdToDelete).delete();
+    alert("✅ تم حذف المستخدم بنجاح");
+  } catch(err){
+    alert("❌ حصل خطأ أثناء الحذف");
+    console.error(err);
+  }
+}
 
-/* Top Active Users (by visitsCount) */
-const topActiveList=document.getElementById('topActiveList');
-db.collection('users').orderBy('visitsCount','desc').limit(10).onSnapshot(snapshot=>{
-  topActiveList.innerHTML='';
-  snapshot.forEach(doc=>{
-    const d=doc.data();
-    const visits=d.visitsCount||0;
-    const lastVisit=d.lastVisit?d.lastVisit.toDate().toLocaleString():'';
-    const durationSec=d.totalDuration||0;
-    const li=document.createElement('li');
-    li.innerHTML=`<strong>${d.name}</strong> | ID: ${d.deviceId}<br>Visits: ${visits} | Last: ${lastVisit} | Duration: ${durationSec} sec`;
-    topActiveList.appendChild(li);
-  });
-});
 </script>
+
 </body>
 </html>
-
