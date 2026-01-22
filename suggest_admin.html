@@ -4,73 +4,45 @@
 <meta charset="UTF-8">
 <title>Admin Dashboard | Mohamed Refaat</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-
 <style>
 :root { --primary:#e63946; --secondary:#b71c1c; --light:#fceae9; --dark:#2b0a0a; }
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
 body{background:var(--light);color:var(--dark);}
 header{padding:25px;text-align:center;background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff;}
-
 .container{max-width:1200px;margin:40px auto;padding:20px;}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:25px;}
-
 .box{
   background:#fff;
   padding:20px;
   border-radius:14px;
   box-shadow:0 5px 15px rgba(0,0,0,0.1);
 }
-
 .box h2{margin-bottom:15px;font-size:1.4rem;}
 ul{list-style:none;}
 li{margin-bottom:15px;padding:15px;border-radius:10px;background:#fdfdfd;border-left:6px solid #ccc;}
 .small{font-size:0.85rem;color:#666;}
 .foreign{border-left-color:#e63946;}
 .local{border-left-color:#2a9d8f;}
+button{margin-top:6px;padding:5px 10px;border:none;border-radius:6px;cursor:pointer;background:#b71c1c;color:white;}
+button:hover{opacity:0.85;}
 </style>
 </head>
-
 <body>
-
-<!-- 🔐 Password -->
-<script>
-const ADMIN_PASSWORD = "12345";
-const p = prompt("Admin password:");
-if(p !== ADMIN_PASSWORD){
-  document.body.innerHTML="<h1 style='text-align:center;margin-top:20%'>🚫 Access Denied</h1>";
-  throw new Error("Denied");
-}
-</script>
-
-<header>
-  <h1>Admin Dashboard</h1>
-  <p>Users – Suggestions – Activity</p>
-</header>
-
-<div class="container">
-  <div class="grid">
-
-    <!-- 🧑‍🤝‍🧑 Users -->
-    <div class="box">
-      <h2>🧑‍🤝‍🧑 Registered Users</h2>
-      <ul id="usersList"></ul>
-    </div>
-
-    <!-- 💡 Suggestions -->
-    <div class="box">
-      <h2>💡 Suggestions</h2>
-      <ul id="suggestionsList"></ul>
-    </div>
-
-  </div>
-</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
 <script>
+// ===== Admin Password كل مرة =====
+const ADMIN_PASSWORD = "12345";
+const pass = prompt("ادخل الباسورد:");
+if(pass !== ADMIN_PASSWORD){
+  document.body.innerHTML="<h1 style='text-align:center;margin-top:20%'>🚫 Access Denied</h1>";
+  throw new Error("Denied");
+}
+const adminName = "Admin"; // يظهر الاسم دائمًا ثابت
+// ===== Firebase Config =====
 const firebaseConfig = {
   apiKey: "AIzaSyCaMUN2J922Uer9xGfhrBbrnlBNp2YljP0",
   authDomain: "mrefaat-2548a.firebaseapp.com",
@@ -83,10 +55,30 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-/* USERS */
-db.collection("users")
-.orderBy("lastVisit","desc")
-.onSnapshot(snap=>{
+// ===== Dashboard Header =====
+const header = document.createElement("header");
+header.innerHTML = `<h1>Admin Dashboard</h1><p>Welcome, ${adminName} | Users & Suggestions</p>`;
+document.body.appendChild(header);
+
+// ===== Container =====
+const container = document.createElement("div");
+container.className = "container";
+container.innerHTML = `
+  <div class="grid">
+    <div class="box">
+      <h2>🧑‍🤝‍🧑 Registered Users</h2>
+      <ul id="usersList"></ul>
+    </div>
+    <div class="box">
+      <h2>💡 Suggestions</h2>
+      <ul id="suggestionsList"></ul>
+    </div>
+  </div>
+`;
+document.body.appendChild(container);
+
+// ===== Users List =====
+db.collection("users").orderBy("lastVisit","desc").onSnapshot(snap=>{
   const ul = document.getElementById("usersList");
   ul.innerHTML="";
   snap.forEach(doc=>{
@@ -102,18 +94,14 @@ db.collection("users")
       🔁 Visits: ${d.visits}<br>
       ⏰ Last: ${last}
       ${foreign ? "<div class='small'>🚨 Outside Egypt</div>" : ""}
-      <button onclick="deleteUser('dev_xxxxxx')">
-  🗑 حذف
-</button>
+      <button onclick="deleteUser('${d.deviceId}')">🗑 حذف</button>
     `;
     ul.appendChild(li);
   });
 });
 
-/* SUGGESTIONS */
-db.collection("suggestions")
-.orderBy("timestamp","desc")
-.onSnapshot(snap=>{
+// ===== Suggestions List =====
+db.collection("suggestions").orderBy("timestamp","desc").onSnapshot(snap=>{
   const ul = document.getElementById("suggestionsList");
   ul.innerHTML="";
   snap.forEach(doc=>{
@@ -122,24 +110,33 @@ db.collection("suggestions")
     const li = document.createElement("li");
     li.innerHTML = `
       <strong>${d.name}</strong>
-      <p>${d.suggestion}</p>
-      <span class="small">${time}</span>
+      <p contenteditable="true" onblur="updateSuggestion('${doc.id}', this.innerText)">${d.suggestion}</p>
+      <span class="small">${time}</span><br>
+      <button onclick="deleteSuggestion('${doc.id}')">🗑 حذف</button>
     `;
     ul.appendChild(li);
   });
 });
+
+// ===== Delete User =====
 async function deleteUser(deviceIdToDelete){
   if(!confirm("متأكد إنك عايز تحذف الشخص ده؟ هيضطر يسجل من أول وجديد")) return;
-
-  try {
-    await db.collection("users").doc(deviceIdToDelete).delete();
-    alert("✅ تم حذف المستخدم بنجاح");
-  } catch(err){
-    alert("❌ حصل خطأ أثناء الحذف");
-    console.error(err);
-  }
+  try { await db.collection("users").doc(deviceIdToDelete).delete(); } 
+  catch(err){console.error(err);}
 }
 
+// ===== Delete Suggestion =====
+async function deleteSuggestion(docId){
+  if(!confirm("متأكد إنك عايز تحذف الاقتراح؟")) return;
+  try { await db.collection("suggestions").doc(docId).delete(); } 
+  catch(err){console.error(err);}
+}
+
+// ===== Update Suggestion =====
+async function updateSuggestion(docId, newText){
+  try { await db.collection("suggestions").doc(docId).update({suggestion:newText}); } 
+  catch(err){console.error(err);}
+}
 </script>
 
 </body>
