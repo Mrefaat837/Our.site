@@ -98,6 +98,8 @@ button:hover{
 </div>
 
 <script>
+  fetch(`surah/surah${i}.json`)
+
 let quranData = [];
 let currentSurahIndex = 0;
 
@@ -182,3 +184,4 @@ loadQuran();
 
 </body>
 </html>
+
