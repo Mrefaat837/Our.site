@@ -4,180 +4,180 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>المصحف الإلكتروني | Mohamed Refaat</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Amiri&display=swap" rel="stylesheet">
+
 <style>
-  body { font-family: 'Amiri', serif; background: #fdf6e3; color: #000; margin:0; padding:0; }
-  header { text-align:center; padding:20px; background:#b71c1c; color:white; }
-  h1 { margin:0; }
-  select, input { padding:8px 12px; margin:5px; border-radius:6px; border:1px solid #aaa; font-size:16px; }
-  #searchBox { width:60%; }
-  #quranContainer { padding:20px; max-width:900px; margin:auto; line-height:2; }
-  .ayah { margin-bottom:10px; font-size:22px; }
-  .ayah span { display:inline-block; }
-  .red { color:#e63946; }   /* مثال ألوان التجويد */
-  .green { color:#2a9d8f; }
-  .blue { color:#264653; }
-  .navBtns { text-align:center; margin:15px 0; }
-  button { padding:8px 12px; margin:3px; border:none; border-radius:6px; background:#b71c1c; color:white; cursor:pointer; }
-  button:hover { background:#880e4f; }
-  section { max-width:900px; margin:20px auto; }
-  .books { background:#f4a261; padding:15px; border-radius:10px; margin-top:20px; }
+body{
+  font-family: 'Amiri', serif;
+  background:#fafafa;
+  margin:0;
+  direction:rtl;
+  color:#111;
+}
+
+/* الهيدر */
+header{
+  background:#1b5e20;
+  color:white;
+  padding:15px;
+  text-align:center;
+}
+
+header h1{
+  margin:0 0 10px;
+}
+
+/* الأدوات */
+select,input,button{
+  padding:8px 10px;
+  font-size:16px;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+
+button{
+  background:#2e7d32;
+  color:white;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#1b5e20;
+}
+
+/* محتوى المصحف */
+#quranContainer{
+  max-width:900px;
+  margin:30px auto;
+  padding:25px;
+  background:white;
+  line-height:2.6;
+  font-size:22px;
+  border-radius:10px;
+}
+
+/* الآية */
+.ayah{
+  margin-bottom:14px;
+}
+
+.ayah-number{
+  color:#1b5e20;
+  font-size:18px;
+  margin-right:6px;
+}
+
+/* الكتب */
+.books{
+  max-width:900px;
+  margin:30px auto;
+  background:#f1f8e9;
+  padding:15px;
+  border-radius:10px;
+}
 </style>
 </head>
+
 <body>
 
 <header>
-  <h1>المصحف الإلكتروني</h1>
+  <h1>📖 المصحف الإلكتروني</h1>
   <div>
     <select id="surahSelect"></select>
     <input type="number" id="ayahInput" placeholder="رقم الآية">
     <button onclick="goToAyah()">اذهب</button>
-    <input type="text" id="searchBox" placeholder="بحث عن نص">
-    <button onclick="searchAyah()">بحث</button>
   </div>
 </header>
 
-<div class="navBtns">
-  <button onclick="prevAyah()">الآية السابقة</button>
-  <button onclick="nextAyah()">الآية التالية</button>
-  <button onclick="prevSurah()">السورة السابقة</button>
-  <button onclick="nextSurah()">السورة التالية</button>
+<div id="quranContainer">جاري تحميل المصحف...</div>
+
+<div class="books">
+  <h2>📚 الكتب الدينية</h2>
+  <p>سيتم إضافتها لاحقًا</p>
 </div>
-
-<div id="quranContainer">تحميل المصحف...</div>
-
-<section>
-  <h2>الكتب الدينية</h2>
-  <div id="booksContainer" class="books">
-    <p>هنا ستظهر الكتب الدينية لاحقًا.</p>
-  </div>
-  <button onclick="addBook()">أضف كتاب</button>
-</section>
 
 <script>
 let quranData = [];
 let currentSurahIndex = 0;
-let currentAyahIndex = 0;
 
-// تحميل كل سور المصحف محليًا
-async function loadLocalQuran(){
-  for(let i=1; i<=114; i++){
-    try {
+/* تحميل السور */
+async function loadQuran(){
+  for(let i=1;i<=114;i++){
+    try{
       const res = await fetch(`surah/surah${i}.json`);
-      const surah = await res.json();
-      quranData.push(surah);
-    } catch(err){
-      console.error("Error loading surah", i, err);
+      const data = await res.json();
+      quranData.push(data);
+    }catch(e){
+      console.error("خطأ في سورة",i);
     }
   }
-  populateSurahSelect();
-  renderAyah();
+  fillSurahSelect();
+  renderSurah();
 }
 
-loadLocalQuran();
+/* ملء القائمة بأسماء السور */
+function fillSurahSelect(){
+  const select = document.getElementById("surahSelect");
+  select.innerHTML="";
 
-// ملء قائمة السور
-function populateSurahSelect(){
-  const sel = document.getElementById("surahSelect");
-  quranData.forEach((s,i)=>{
+  quranData.forEach((surah,index)=>{
     const opt = document.createElement("option");
-    opt.value=i;
-    opt.text=s.name;
-    sel.appendChild(opt);
+    opt.value=index;
+    opt.textContent = `سورة ${arabicSurahName(surah.index)}`;
+    select.appendChild(opt);
   });
-  sel.addEventListener("change",(e)=>{
-    currentSurahIndex=parseInt(e.target.value);
-    currentAyahIndex=0;
-    renderAyah();
-  });
-}
 
-// عرض الآيات
-function renderAyah(){
-  if(!quranData.length) return;
-  const container = document.getElementById("quranContainer");
-  const surah = quranData[currentSurahIndex];
-  container.innerHTML = "";
-  surah.ayahs.forEach((ayah,i)=>{
-    const ay = document.createElement("div");
-    ay.className="ayah";
-    ay.innerHTML = `<span class="blue">(${i+1})</span> ${ayah.text}`;
-    container.appendChild(ay);
-  });
-}
-
-// الذهاب لآية محددة
-function goToAyah(){
-  const ayahInput = parseInt(document.getElementById("ayahInput").value)-1;
-  if(!isNaN(ayahInput) && ayahInput>=0 && ayahInput<quranData[currentSurahIndex].ayahs.length){
-    currentAyahIndex=ayahInput;
-    const container = document.getElementById("quranContainer");
-    const target = container.children[currentAyahIndex];
-    if(target) target.scrollIntoView({behavior:"smooth"});
+  select.onchange=()=>{
+    currentSurahIndex=select.value;
+    renderSurah();
   }
 }
 
-// البحث في المصحف
-function searchAyah(){
-  const text = document.getElementById("searchBox").value.trim();
-  if(!text) return;
-  const container = document.getElementById("quranContainer");
+/* عرض السورة */
+function renderSurah(){
+  const container=document.getElementById("quranContainer");
   container.innerHTML="";
-  quranData.forEach((surah)=>{
-    surah.ayahs.forEach((ayah,i)=>{
-      if(ayah.text.includes(text)){
-        const ay = document.createElement("div");
-        ay.className="ayah";
-        ay.innerHTML = `<span class="blue">(${i+1}) ${surah.name}:</span> ${ayah.text}`;
-        container.appendChild(ay);
-      }
-    });
+
+  const surah=quranData[currentSurahIndex];
+  const verses=Object.values(surah.verse);
+
+  verses.forEach((text,i)=>{
+    const div=document.createElement("div");
+    div.className="ayah";
+    div.innerHTML=`${text} <span class="ayah-number">﴿${i+1}﴾</span>`;
+    container.appendChild(div);
   });
 }
 
-// أزرار التنقل بين الآيات والسور
-function nextAyah(){
-  if(currentAyahIndex < quranData[currentSurahIndex].ayahs.length-1){
-    currentAyahIndex++;
-    goToAyah();
-  }
-}
-function prevAyah(){
-  if(currentAyahIndex >0){
-    currentAyahIndex--;
-    goToAyah();
-  }
-}
-function nextSurah(){
-  if(currentSurahIndex < quranData.length-1){
-    currentSurahIndex++;
-    currentAyahIndex=0;
-    renderAyah();
-  }
-}
-function prevSurah(){
-  if(currentSurahIndex>0){
-    currentSurahIndex--;
-    currentAyahIndex=0;
-    renderAyah();
-  }
+/* الذهاب لآية */
+function goToAyah(){
+  const num=document.getElementById("ayahInput").value;
+  if(!num)return;
+  const ayah=document.querySelectorAll(".ayah")[num-1];
+  if(ayah) ayah.scrollIntoView({behavior:"smooth"});
 }
 
-// الكتب الدينية
-function addBook(){
-  const title = prompt("اسم الكتاب:");
-  const desc = prompt("الوصف:");
-  const container = document.getElementById("booksContainer");
-  if(title && desc){
-    const div = document.createElement("div");
-    div.style.background="#fff";
-    div.style.margin="5px";
-    div.style.padding="8px";
-    div.style.borderRadius="6px";
-    div.innerHTML=`<strong>${title}</strong><p>${desc}</p>`;
-    container.appendChild(div);
-  }
+/* أسماء السور بالعربي */
+function arabicSurahName(i){
+  const names=[
+    "الفاتحة","البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف","الأنفال","التوبة","يونس",
+    "هود","يوسف","الرعد","إبراهيم","الحجر","النحل","الإسراء","الكهف","مريم","طه",
+    "الأنبياء","الحج","المؤمنون","النور","الفرقان","الشعراء","النمل","القصص","العنكبوت","الروم",
+    "لقمان","السجدة","الأحزاب","سبأ","فاطر","يس","الصافات","ص","الزمر","غافر",
+    "فصلت","الشورى","الزخرف","الدخان","الجاثية","الأحقاف","محمد","الفتح","الحجرات","ق",
+    "الذاريات","الطور","النجم","القمر","الرحمن","الواقعة","الحديد","المجادلة","الحشر","الممتحنة",
+    "الصف","الجمعة","المنافقون","التغابن","الطلاق","التحريم","الملك","القلم","الحاقة","المعارج",
+    "نوح","الجن","المزمل","المدثر","القيامة","الإنسان","المرسلات","النبأ","النازعات","عبس",
+    "التكوير","الإنفطار","المطففين","الإنشقاق","البروج","الطارق","الأعلى","الغاشية","الفجر","البلد",
+    "الشمس","الليل","الضحى","الشرح","التين","العلق","القدر","البينة","الزلزلة","العاديات",
+    "القارعة","التكاثر","العصر","الهمزة","الفيل","قريش","الماعون","الكوثر","الكافرون","النصر",
+    "المسد","الإخلاص","الفلق","الناس"
+  ];
+  return names[parseInt(i)-1] || i;
 }
+
+loadQuran();
 </script>
 
 </body>
