@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Dashboard | Mohamed Refaat</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --primary:#e63946;
+  --secondary:#b71c1c;
+  --light:#fceae9;
+  --dark:#2b0a0a;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Poppins',sans-serif;
+  background:var(--light);
+  color:var(--dark);
+}
+
+/* ===== Sidebar ===== */
+#sidebar{
+  position:fixed;
+  left:-280px;
+  top:0;
+  width:280px;
+  height:100%;
+  background:var(--primary);
+  color:#fff;
+  padding:90px 25px;
+  transition:0.4s;
+  z-index:1000;
+  overflow-y:auto;
+}
+#sidebar h3{font-size:24px;margin-bottom:20px}
+#sidebar ul{list-style:none;font-size:18px;line-height:2.5}
+#sidebar ul li a{
+  color:white;
+  text-decoration:none;
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+/* Toggle Button */
+#toggleSidebarBtn{
+  position:fixed;
+  top:80px;
+  left:20px;
+  z-index:1001;
+  padding:14px 18px;
+  border:none;
+  border-radius:12px;
+  background:var(--primary);
+  color:white;
+  font-size:26px;
+  cursor:pointer;
+  box-shadow:0 5px 15px rgba(0,0,0,.3);
+}
+
+/* ===== Header ===== */
+header{
+  min-height:120px;
+  background:linear-gradient(135deg,var(--secondary),var(--primary));
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:20px;
+}
+header h1{font-size:2.6rem}
+header p{opacity:.9}
+
+/* ===== Layout ===== */
+.container{
+  max-width:1100px;
+  margin:140px auto 40px;
+  padding:0 20px;
+}
+
+.tabs{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:15px;
+}
+.tabs button{
+  padding:8px 15px;
+  border:none;
+  border-radius:8px;
+  background:var(--primary);
+  color:white;
+  cursor:pointer;
+}
+.tabs button.active{background:var(--secondary)}
+
+.materials{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;
+}
+
+.material-card{
+  background:#fff;
+  border-radius:16px;
+  padding:15px;
+  box-shadow:0 8px 20px rgba(0,0,0,.1);
+  position:relative;
+  transition:.3s;
+}
+.material-card:hover{
+  transform:translateY(-5px);
+}
+.material-card img{
+  max-width:100%;
+  border-radius:8px;
+  margin-bottom:8px;
+}
+.material-card h3{margin-bottom:6px}
+.material-card p{font-size:.9rem}
+
+.card-btn{
+  position:absolute;
+  top:10px;
+  right:10px;
+  border:none;
+  padding:4px 7px;
+  border-radius:6px;
+  cursor:pointer;
+  color:#fff;
+}
+.edit{background:#f4a261}
+.delete{background:#e63946; top:42px}
+
+/* Floating add */
+.add-btn{
+  position:fixed;
+  bottom:30px;
+  right:30px;
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  border:none;
+  background:var(--primary);
+  color:#fff;
+  font-size:26px;
+  cursor:pointer;
+}
+
+/* Form */
+.materialForm{
+  display:none;
+  flex-direction:column;
+  gap:10px;
+  background:#fff;
+  padding:20px;
+  border-radius:12px;
+  position:fixed;
+  bottom:100px;
+  right:20px;
+  width:300px;
+  z-index:1002;
+}
+.materialForm input,.materialForm textarea{
+  padding:8px;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+.materialForm button{
+  border:none;
+  padding:8px;
+  border-radius:6px;
+  background:var(--primary);
+  color:white;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== Sidebar ===== -->
+<div id="sidebar">
+  <h3>📚 Dashboard</h3>
+  <ul>
+    <li><a href="index.html">🏠 Home</a></li>
+    <li><a href="career.html">🧭 Career</a></li>
+    <li><a href="deen.html">🕌 Islamic Routine</a></li>
+    <li><a href="calc.html">🧮 Medical Calculators</a></li>
+    <li><a href="tasks.html">💪 Tasks</a></li>
+    <li><a href="brainwork.html">🧠 Brain Work</a></li>
+    <li><a href="suggest.html">💡 Suggestions</a></li>
+    <li><a href="suggest_admin.html">🔒 Admin</a></li>
+  </ul>
+</div>
+
+<button id="toggleSidebarBtn">☰</button>
+
+<header>
+  <h1>Career Dashboard</h1>
+  <p>All years – one place</p>
+</header>
+
+<div class="container">
+
+  <div class="tabs" id="tabs"></div>
+
+  <div style="text-align:center;margin-bottom:15px">
+    <button onclick="addTab()">➕ Add Year</button>
+    <button onclick="editTab()">✏️ Edit</button>
+    <button onclick="deleteTab()">🗑️ Delete</button>
+  </div>
+
+  <div class="materials" id="materials"></div>
+</div>
+
+<button class="add-btn" onclick="openForm()">➕</button>
+
+<form class="materialForm" id="form">
+  <input id="name" placeholder="Title" required>
+  <textarea id="desc" placeholder="Details"></textarea>
+  <input id="img" placeholder="Image URL">
+  <button>Save</button>
+  <button type="button" onclick="closeForm()">Cancel</button>
+</form>
+
+<script>
+/* Sidebar */
+const sidebar=document.getElementById("sidebar");
+document.getElementById("toggleSidebarBtn").onclick=()=>{
+  sidebar.style.left = sidebar.style.left==="0px" ? "-280px":"0px";
+}
+
+/* Data */
+let data=JSON.parse(localStorage.getItem("careerData"))||{
+  
+};
+let current=Object.keys(data)[0];
+let editIndex=-1;
+
+const tabs=document.getElementById("tabs");
+const materials=document.getElementById("materials");
+
+/* Render Tabs */
+function renderTabs(){
+  tabs.innerHTML="";
+  Object.keys(data).forEach(t=>{
+    let b=document.createElement("button");
+    b.textContent=t;
+    if(t===current) b.classList.add("active");
+    b.onclick=()=>{current=t;renderTabs();renderCards()}
+    tabs.appendChild(b);
+  })
+}
+
+/* Cards */
+function renderCards(){
+  materials.innerHTML="";
+  data[current].forEach((c,i)=>{
+    materials.innerHTML+=`
+    <div class="material-card">
+      <h3>${c.name}</h3>
+      ${c.img?`<img src="${c.img}">`:""}
+      <p>${c.desc}</p>
+      <button class="card-btn edit" onclick="editCard(${i})">✏️</button>
+      <button class="card-btn delete" onclick="deleteCard(${i})">🗑️</button>
+    </div>`;
+  })
+}
+
+/* CRUD */
+function addTab(){
+  let n=prompt("New Year name");
+  if(n&&!data[n]){data[n]=[];current=n;save()}
+}
+function editTab(){
+  let n=prompt("Rename Year",current);
+  if(n&&!data[n]){
+    data[n]=data[current];
+    delete data[current];
+    current=n; save();
+  }
+}
+function deleteTab(){
+  if(confirm("Delete year?")){
+    delete data[current];
+    current=Object.keys(data)[0];
+    save();
+  }
+}
+function openForm(){document.getElementById("form").style.display="flex"}
+function closeForm(){document.getElementById("form").style.display="none";editIndex=-1}
+function editCard(i){
+  editIndex=i;
+  let c=data[current][i];
+  name.value=c.name; desc.value=c.desc; img.value=c.img;
+  openForm();
+}
+function deleteCard(i){
+  data[current].splice(i,1); save();
+}
+form.onsubmit=e=>{
+  e.preventDefault();
+  let obj={name:name.value,desc:desc.value,img:img.value};
+  if(editIndex>-1)data[current][editIndex]=obj;
+  else data[current].push(obj);
+  closeForm(); save();
+}
+function save(){
+  localStorage.setItem("careerData",JSON.stringify(data));
+  renderTabs(); renderCards();
+}
+
+renderTabs(); renderCards();
+</script>
+
+</body>
+</html>
