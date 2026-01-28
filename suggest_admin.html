@@ -137,7 +137,40 @@ async function updateSuggestion(docId, newText){
   try { await db.collection("suggestions").doc(docId).update({suggestion:newText}); } 
   catch(err){console.error(err);}
 }
+  async function loadTopVisitors(){
+  const container = document.createElement("div");
+  container.style.position = "fixed";
+  container.style.top = "90px";
+  container.style.right = "20px";
+  container.style.width = "260px";
+  container.style.background = "#fff";
+  container.style.padding = "15px";
+  container.style.borderRadius = "12px";
+  container.style.boxShadow = "0 10px 30px rgba(0,0,0,.2)";
+  container.style.zIndex = "2000";
+  container.innerHTML = "<h3>🔥 الأكثر دخولًا</h3>";
+
+  document.body.appendChild(container);
+
+  const snap = await db.collection("users")
+    .orderBy("visits","desc")
+    .limit(5)
+    .get();
+
+  snap.forEach(doc=>{
+    const d = doc.data();
+    container.innerHTML += `
+      <div style="font-size:14px;border-bottom:1px solid #eee;padding:6px 0">
+        👤 ${d.name}<br>
+        🌍 ${d.country} - ${d.city}<br>
+        🔁 ${d.visits} زيارة
+      </div>`;
+  });
+}
+
+loadTopVisitors();
 </script>
 
 </body>
 </html>
+
